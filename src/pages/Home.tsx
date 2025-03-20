@@ -27,6 +27,14 @@ const HomePage: React.FC = () => {
 
   return (
     <Layout>
+      <section className="mt-8">
+        <h2 className="text-xl mb-2">
+          <span className="text-yellow-500 font-bold">roy@terminal:~$</span> 
+          <span className="text-blue-400">whoami</span>
+        </h2>
+        <p>Cook | Trying to make sense of the world...</p>
+      </section>
+
       <section>
         {loading && (
           <p className="flex items-center">
@@ -53,14 +61,6 @@ const HomePage: React.FC = () => {
             <Link to={`/posts/${post.slug}`} className="text-blue-400 hover:underline italic">Read full post...</Link>
           </article>
         ))}
-      </section>
-      
-      <section className="mt-8">
-        <h2 className="text-xl mb-2">
-          <span className="text-yellow-500 font-bold">roy@terminal:~$</span> 
-          <span className="text-blue-400">whoami</span>
-        </h2>
-        <p>Backend engineer with a passion for clean architecture and efficient systems. When I'm not optimizing databases or designing APIs, I'm exploring new technologies and sharing what I learn.</p>
       </section>
     </Layout>
   );
