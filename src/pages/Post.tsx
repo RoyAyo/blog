@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import Layout from '../components/Layout';
@@ -28,14 +29,12 @@ const PostPage: React.FC = () => {
     loadPost();
   }, [slug]);
 
-  // Function to fetch a specific post by its slug
   const fetchPostBySlug = async (postSlug: string): Promise<Post> => {
+    // eslint-disable-next-line no-async-promise-executor
     return new Promise(async (resolve, reject) => {
       try {
-        // Use Vite's glob import to get all MDX files (with eager loading)
         const postModules = import.meta.glob('../blog/**/*.mdx', { eager: true });
         
-        // Find the file path that matches the slug
         const matchingPath = Object.keys(postModules).find(path => {
           const filename = path.split('/').pop() || '';
           const fileSlug = filename.replace(/\.mdx$/, '');
@@ -103,7 +102,7 @@ const PostPage: React.FC = () => {
               content = content.replace(/---[\s\S]*?---/, '').trim();
             }
           } catch (txtErr) {
-            console.log('No text version available');
+            console.log('No text version available', txtErr);
           }
         }
 

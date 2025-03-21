@@ -1,11 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import Layout from '../components/Layout';
 import { Post } from '../utils/types';
 
-const POSTS_PER_PAGE = 5; // Number of posts to display per page
+const POSTS_PER_PAGE = 6;
 
-// Filter types for stronger filtering logic options
 type FilterLogic = 'ANY' | 'ALL';
 
 const AllPostsPage: React.FC = () => {
@@ -50,35 +50,29 @@ const AllPostsPage: React.FC = () => {
             console.log('Module structure:', mod);
             
             // Try different methods to extract frontmatter based on common MDX configurations
-            let frontmatter = null;
+            let frontmatter: any = null;
             
-            // Method 1: Direct frontmatter property
             if (mod.frontmatter) {
               frontmatter = mod.frontmatter;
-              console.log('Found frontmatter via .frontmatter property');
             } 
-            // Method 2: Check attributes (used by some MDX plugins)
+
             else if (mod.attributes) {
               frontmatter = mod.attributes;
-              console.log('Found frontmatter via .attributes property');
             } 
-            // Method 3: Check metadata (used by some other MDX plugins)
+
             else if (mod.metadata) {
               frontmatter = mod.metadata;
-              console.log('Found frontmatter via .metadata property');
             }
-            // Method 4: If there's default export that might contain metadata
+
             else if (mod.default && typeof mod.default === 'object' && mod.default.metadata) {
               frontmatter = mod.default.metadata;
               console.log('Found frontmatter via .default.metadata property');
             }
-            // Method 5: Last resort - try to parse it from raw content if available
             else if (mod.default && typeof mod.default === 'string' && mod.default.startsWith('---')) {
               try {
                 const content = mod.default as string;
                 const fmMatch = content.match(/---\n([\s\S]*?)\n---/);
                 if (fmMatch && fmMatch[1]) {
-                  // Primitive YAML parsing for frontmatter
                   const fmLines = fmMatch[1].split('\n');
                   frontmatter = {};
                   fmLines.forEach(line => {
@@ -109,24 +103,19 @@ const AllPostsPage: React.FC = () => {
               frontmatter = {};
             }
             
-            // Extract slug from file path
             const slug = path.split('/').pop()?.replace(/\.mdx$/, '') || '';
             
-            // Ensure tags is an array and normalize it
             const tags = Array.isArray(frontmatter.tags) 
               ? frontmatter.tags 
               : (typeof frontmatter.tags === 'string' 
                 ? [frontmatter.tags] 
                 : []);
             
-            // Add each tag to our set of all tags
             tags.forEach((tag: string) => tagsSet.add(tag));
             
-            // Extract category if present
             const category = frontmatter.category || 'Uncategorized';
             categoriesSet.add(category);
             
-            // Create post object with all necessary data
             const post: Post = {
               id: slug,
               slug,
@@ -135,15 +124,8 @@ const AllPostsPage: React.FC = () => {
               excerpt: frontmatter.description || frontmatter.excerpt || 'No description available',
               category,
               tags,
-              content: '' // Not needed for the list view
+              content: ''
             };
-            
-            console.log('Processed post:', {
-              slug: post.slug,
-              title: post.title,
-              tags: post.tags,
-              category: post.category
-            });
             
             postData.push(post);
           } catch (importError) {
@@ -151,14 +133,10 @@ const AllPostsPage: React.FC = () => {
           }
         }
 
-        console.log(`Successfully processed ${postData.length} posts`);
-        
-        // Sort by publish date (newest first)
         const sortedPosts = postData.sort((a, b) => 
           new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
         );
 
-        // Convert tags set to sorted array
         const sortedTags = Array.from(tagsSet).sort();
         const sortedCategories = Array.from(categoriesSet).sort();
         
@@ -168,8 +146,6 @@ const AllPostsPage: React.FC = () => {
         setCategories(sortedCategories);
         setLoading(false);
         
-        console.log('All tags:', sortedTags);
-        console.log('All categories:', sortedCategories);
       } catch (err) {
         console.error("Failed to load blog posts:", err);
         setError("Failed to load blog posts. Please try again later.");
@@ -180,16 +156,13 @@ const AllPostsPage: React.FC = () => {
     fetchPosts();
   }, []);
 
-  // Apply all filters (tags, category, search) and update filtered posts
   useEffect(() => {
     let result = [...posts];
     
-    // Apply category filter if selected
     if (selectedCategory && selectedCategory !== 'All') {
       result = result.filter(post => post.category === selectedCategory);
     }
     
-    // Apply tag filters based on selected logic
     if (selectedTags.length > 0) {
       if (filterLogic === 'ANY') {
         // ANY logic: post must have at least one of the selected tags
@@ -197,14 +170,12 @@ const AllPostsPage: React.FC = () => {
           selectedTags.some(tag => post.tags.includes(tag))
         );
       } else {
-        // ALL logic: post must have all selected tags
         result = result.filter(post => 
           selectedTags.every(tag => post.tags.includes(tag))
         );
       }
     }
     
-    // Apply search filter
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
       result = result.filter(post => 
@@ -215,32 +186,26 @@ const AllPostsPage: React.FC = () => {
     }
     
     setFilteredPosts(result);
-    setCurrentPage(1); // Reset to first page when filters change
+    setCurrentPage(1);
   }, [selectedTags, selectedCategory, filterLogic, searchQuery, posts]);
 
-  // Handle pagination
   useEffect(() => {
     const totalPages = Math.ceil(filteredPosts.length / POSTS_PER_PAGE);
-    setTotalPages(totalPages || 1); // Ensure at least 1 page
+    setTotalPages(totalPages || 1);
     
-    // Calculate displayed posts for current page
     const startIndex = (currentPage - 1) * POSTS_PER_PAGE;
     const endIndex = startIndex + POSTS_PER_PAGE;
     setDisplayedPosts(filteredPosts.slice(startIndex, endIndex));
   }, [filteredPosts, currentPage]);
 
-  // Toggle tag selection
   const toggleTag = (tag: string) => {
     if (selectedTags.includes(tag)) {
-      // Remove tag if already selected
       setSelectedTags(selectedTags.filter(t => t !== tag));
     } else {
-      // Add tag if not selected
       setSelectedTags([...selectedTags, tag]);
     }
   };
 
-  // Clear all filters
   const clearFilters = () => {
     setSelectedTags([]);
     setSelectedCategory(null);
@@ -248,7 +213,6 @@ const AllPostsPage: React.FC = () => {
     setFilterLogic('ANY');
   };
 
-  // Generate pagination components
   const renderPagination = () => {
     if (totalPages <= 1) return null;
     
@@ -380,7 +344,6 @@ const AllPostsPage: React.FC = () => {
           </div>
         </div>
         
-        {/* Tag filter section */}
         <div className="mb-6">
           <div className="flex items-center justify-between mb-2">
             <h2 className="text-lg">Filter by tags:</h2>
