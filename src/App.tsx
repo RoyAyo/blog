@@ -7,11 +7,6 @@ import Post from './pages/Post';
 import AllPosts from './pages/AllPosts';
 import NotFound from './pages/NotFound';
 import './styles/tailwind.css';
-import LoginPage from './pages/auth/Login';
-import AdminDashboard from './pages/admin/dashboard';
-import ProtectedRoute from './utils/ProtectedRoutes';
-import PostsList from './pages/admin/PostsList';
-import { AuthProvider } from './utils/AuthContext';
 
 const App: React.FC = () => {
   return (
@@ -20,22 +15,6 @@ const App: React.FC = () => {
         <Route path="/" element={<Home />} />
         <Route path="/posts/:slug" element={<Post />} />
         <Route path="/posts" element={<AllPosts />} />
-        <Route
-          path="/admin/*"
-          element={
-            <AuthProvider>
-              <Routes>
-                <Route path="/login" element={<LoginPage />} />
-              </Routes>
-              <ProtectedRoute>
-                <Routes>
-                  <Route path="dashboard" element={<AdminDashboard />} />
-                  <Route path="posts" element={<PostsList />} />
-                </Routes>
-              </ProtectedRoute>
-            </AuthProvider>
-          }
-        />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>

@@ -2,27 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Layout from '../components/Layout';
 import { Post } from '../utils/types';
-import { fetchAllPosts } from '../utils/api';
 
 const AllPostsPage: React.FC = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const loadPosts = async () => {
-      try {
-        const allPosts = await fetchAllPosts();
-        setPosts(allPosts);
-        setLoading(false);
-      } catch (err) {
-        setError('Failed to load posts. Please try again later.');
-        setLoading(false);
-      }
-    };
-
-    loadPosts();
-  }, []);
 
   return (
     <Layout>
