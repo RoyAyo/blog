@@ -20,11 +20,13 @@ const App: React.FC = () => {
         <Route path="/" element={<Home />} />
         <Route path="/posts/:slug" element={<Post />} />
         <Route path="/posts" element={<AllPosts />} />
-        <Route path="/admin/login" element={<LoginPage />} />
         <Route
           path="/admin/*"
           element={
             <AuthProvider>
+              <Routes>
+                <Route path="/login" element={<LoginPage />} />
+              </Routes>
               <ProtectedRoute>
                 <Routes>
                   <Route path="dashboard" element={<AdminDashboard />} />

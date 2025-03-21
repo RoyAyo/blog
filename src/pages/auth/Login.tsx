@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../utils/AuthContext';
 
@@ -12,19 +12,56 @@ const LoginPage: React.FC = () => {
     username: '',
     password: '',
   });
+  const [currentPrompt, setCurrentPrompt] = useState<'username' | 'password'>('username');
   const [error, setError] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
+  const [bootText, setBootText] = useState<string[]>([]);
   const { setIsAuthenticated } = useAuth();
   const navigate = useNavigate();
 
+  useEffect(() => {
+    const bootSequence = [
+      "RETRO-OS v1.0.3 BOOT SEQUENCE INITIATED",
+      "CHECKING MEMORY................DONE",
+      "INITIALIZING RESOURCES........DONE",
+      "LOADING ADMIN INTERFACE.......DONE",
+      "ESTABLISHING SECURE CONNECTION...",
+      "ACCESS TERMINAL READY"
+    ];
+    
+    const typeBootText = async () => {
+      for (let i = 0; i < bootSequence.length; i++) {
+        await new Promise(resolve => setTimeout(resolve, 400));
+        setBootText(prev => [...prev, bootSequence[i]]);
+      }
+    };
+    
+    typeBootText();
+  }, []);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCredentials({ ...credentials, [e.target.name]: e.target.value });
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (currentPrompt === 'username') {
+        setCurrentPrompt('password');
+      } else {
+        handleSubmit(e as any);
+      }
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
+    
+    setBootText(prev => [...prev, `AUTHENTICATING USER: ${credentials.username}`]);
+    await new Promise(resolve => setTimeout(resolve, 800));
+    setBootText(prev => [...prev, "VALIDATING CREDENTIALS..."]);
 
     try {
       const response = await fetch('http://localhost:8080/api/auth/login', {
@@ -35,29 +72,75 @@ const LoginPage: React.FC = () => {
       });
 
       if (!response.ok) throw new Error('Invalid credentials');
- 
+      
+      setBootText(prev => [...prev, "ACCESS GRANTED"]);
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
       setIsAuthenticated(true);
       navigate('/admin/dashboard');
     } catch (err) {
       console.error(err);
-      setError('Invalid username or password');
+      setBootText(prev => [...prev, "ACCESS DENIED: INVALID CREDENTIALS"]);
+      setError('Authentication failure: Invalid username or password');
+      setCurrentPrompt('username');
+      setCredentials({ username: '', password: '' });
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-900 to-indigo-900 flex items-center justify-center p-4">
-      <div className="bg-gray-800 rounded-lg shadow-xl p-8 w-full max-w-md border border-purple-500">
-        <h1 className="text-3xl font-bold text-purple-400 text-center">Retro Blog Admin</h1>
-        {error && <div className="text-red-400">{error}</div>}
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <input name="username" type="text" placeholder="Username" className="w-full p-2" onChange={handleChange} />
-          <input name="password" type="password" placeholder="Password" className="w-full p-2" onChange={handleChange} />
-          <button type="submit" className="bg-purple-600 text-white w-full p-2">
-            {loading ? 'Logging in...' : 'Login'}
-          </button>
-        </form>
+    <div className="min-h-screen bg-black text-green-500 p-4 font-mono flex flex-col">
+      <div className="flex-1 overflow-auto p-4 max-w-3xl mx-auto w-full">
+        <div className="terminal-output mb-4">
+          {bootText.map((line, index) => (
+            <div key={index} className="mb-1">{line}</div>
+          ))}
+        </div>
+        
+        {bootText.length >= 6 && !loading && (
+          <div className="login-prompt mt-8">
+            {error && <div className="text-red-500 mb-4"> ERROR: {error}</div>}
+            
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {currentPrompt === 'username' ? (
+                <div className="flex">
+                  <span className="mr-2"> username:</span>
+                  <input
+                    name="username"
+                    type="text"
+                    value={credentials.username}
+                    onChange={handleChange}
+                    onKeyDown={handleKeyDown}
+                    autoFocus
+                    className="bg-transparent border-none outline-none text-green-500 flex-1"
+                    autoComplete="off"
+                  />
+                </div>
+              ) : (
+                <div>
+                  <div> username: {credentials.username}</div>
+                  <div className="flex">
+                    <span className="mr-2"> password:</span>
+                    <input
+                      name="password"
+                      type="password"
+                      value={credentials.password}
+                      onChange={handleChange}
+                      onKeyDown={handleKeyDown}
+                      autoFocus
+                      className="bg-transparent border-none outline-none text-green-500 flex-1"
+                    />
+                  </div>
+                </div>
+              )}
+              
+              <div className="text-xs text-green-300 mt-8">
+                PRESS ENTER TO CONTINUE | RETRO BLOG ADMIN TERMINAL v2.4.1
+              </div>
+            </form>
+          </div>
+        )}
       </div>
     </div>
   );

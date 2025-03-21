@@ -11,12 +11,11 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
-  // Check authentication on app load
   const checkAuth = async () => {
     try {
-      const response = await fetch('http://localhost:8080/api/auth/check', {
+      const response = await fetch('http://localhost:8080/admin/verify', {
         method: 'GET',
-        credentials: 'include', // Ensures cookies are sent
+        credentials: 'include',
       });
 
       setIsAuthenticated(response.ok);
@@ -27,7 +26,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   useEffect(() => {
-    checkAuth(); // Check auth on mount
+    checkAuth();
   }, []);
 
   return (
@@ -37,7 +36,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   );
 };
 
-// Custom Hook to use AuthContext
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) throw new Error('useAuth must be used within an AuthProvider');
