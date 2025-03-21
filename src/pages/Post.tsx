@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import Layout from '../components/Layout';
-import { Post } from '../utils/types';
-import { fetchPostBySlug } from '../utils/api';
+import { Post } from '../utils/types.ts';
 import ReactMarkdown from 'react-markdown';
 
 const PostPage: React.FC = () => {
@@ -20,6 +19,7 @@ const PostPage: React.FC = () => {
         setPost(fetchedPost);
         setLoading(false);
       } catch (err) {
+        console.error("Error loading post:", err);
         setError('Failed to load post. Please try again later.');
         setLoading(false);
       }
@@ -27,6 +27,101 @@ const PostPage: React.FC = () => {
 
     loadPost();
   }, [slug]);
+
+  // Function to fetch a specific post by its slug
+  const fetchPostBySlug = async (postSlug: string): Promise<Post> => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        // Use Vite's glob import to get all MDX files (with eager loading)
+        const postModules = import.meta.glob('../blog/**/*.mdx', { eager: true });
+        
+        // Find the file path that matches the slug
+        const matchingPath = Object.keys(postModules).find(path => {
+          const filename = path.split('/').pop() || '';
+          const fileSlug = filename.replace(/\.mdx$/, '');
+          return fileSlug === postSlug;
+        });
+
+        if (!matchingPath) {
+          throw new Error(`Post with slug "${postSlug}" not found`);
+        }
+
+        // Get the module content
+        const module = postModules[matchingPath] as any;
+        console.log('Found module:', module);
+        
+        // Try different ways to access frontmatter based on common MDX configurations
+        let frontmatter = module.frontmatter;
+        
+        // If frontmatter is not directly accessible, check other common locations
+        if (!frontmatter && 'attributes' in module) {
+          frontmatter = module.attributes;
+        }
+        
+        if (!frontmatter) {
+          console.warn('Frontmatter not found in module, using empty object');
+          frontmatter = {};
+        }
+        
+        // For raw content extraction, try different approaches
+        let content = '';
+        
+        // Try to get raw content if available
+        if (module.rawContent) {
+          content = module.rawContent;
+        } else if (module.default) {
+          try {
+            // For MDX bundlers that provide a React component
+            // Let's try to get the raw content using ?raw import
+            const rawModule = await import(`../blog/${postSlug}.mdx?raw`).catch(() => null);
+            
+            if (rawModule) {
+              content = rawModule.default;
+              // Remove frontmatter from content
+              content = content.replace(/---[\s\S]*?---/, '').trim();
+            } else {
+              // Fallback to reading the module structure
+              console.log('Could not import raw content, using default component');
+              content = "**Note: Using component render mode. Raw markdown content couldn't be extracted.**";
+            }
+          } catch (err) {
+            console.error('Error getting raw content:', err);
+            content = "**Content loading issue. Please try again later.**";
+          }
+        } else {
+          // Last resort: try to extract content from module
+          content = "**Content unavailable or in an unsupported format.**";
+        }
+        
+        // Try to load content from a text file with the same name if MDX fails
+        if (!content || content.includes("**Note: Using component render mode") || content.includes("**Content loading issue")) {
+          try {
+            const textModule = await import(`../blog/${postSlug}.md?raw`).catch(() => null);
+            if (textModule) {
+              content = textModule.default;
+              // Remove frontmatter
+              content = content.replace(/---[\s\S]*?---/, '').trim();
+            }
+          } catch (txtErr) {
+            console.log('No text version available');
+          }
+        }
+
+        resolve({
+          id: postSlug,
+          slug: postSlug,
+          title: frontmatter.title || 'Untitled Post',
+          publishedAt: frontmatter.publishedAt || new Date().toISOString(),
+          excerpt: frontmatter.description || 'No description available',
+          content: content,
+          tags: frontmatter.tags || []
+        });
+      } catch (error) {
+        console.error(`Error fetching post with slug "${postSlug}":`, error);
+        reject(error);
+      }
+    });
+  };
 
   return (
     <Layout>
