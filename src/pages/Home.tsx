@@ -17,6 +17,7 @@ const HomePage: React.FC = () => {
         setPosts(latestPosts);
         setLoading(false);
       } catch (err) {
+        console.error(err);
         setError('Failed to load posts. Please try again later.');
         setLoading(false);
       }
