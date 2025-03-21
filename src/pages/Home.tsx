@@ -13,12 +13,9 @@ const HomePage: React.FC = () => {
   
   const bootLines = [
     "Initializing system...",
-    "Loading kernel modules...",
     "Mounting filesystems...",
-    "Starting network services...",
     "Checking blog database...",
     "Setting up environment...",
-    "Launching terminal interface..."
   ];
 
   useEffect(() => {
@@ -53,42 +50,31 @@ const HomePage: React.FC = () => {
     }
   }, [bootLines.length, bootSequence, currentLine, loading]);
 
-  // Function to fetch latest posts from MDX files
   const fetchLatestPosts = async (): Promise<Post[]> => {
     return new Promise(resolve => {
-      // Simulate network delay
       setTimeout(async () => {
         try {
-          // Using Vite's glob import to get all MDX files
           const postModules = import.meta.glob('../blog/**/*.mdx', { eager: true });
           
           const posts: Post[] = [];
           
           for (const [path, module] of Object.entries(postModules)) {
             try {
-              // The structure of the module might vary based on your MDX setup
-              // Using type assertion to access the potential frontmatter property
               const mod = module as { default: unknown; frontmatter?: Record<string, any> };
               
-              // Try different ways to access frontmatter based on common MDX configurations
               let frontmatter = mod.frontmatter;
               
-              // If frontmatter is not directly accessible, it might be in a different location
               if (!frontmatter && 'attributes' in (mod as any)) {
                 frontmatter = (mod as any).attributes;
               }
               
-              // If frontmatter still can't be found, log the module structure for debugging
               if (!frontmatter) {
                 console.log('Module structure:', mod);
-                // Use default values
                 frontmatter = {};
               }
               
-              // Extract slug from file path
               const slug = path.split('/').pop()?.replace(/\.mdx$/, '') || '';
               
-              // Use description as excerpt if available, otherwise use a default
               const excerpt = frontmatter.description || 'Click to read more about this post...';
               
               posts.push({
@@ -98,14 +84,13 @@ const HomePage: React.FC = () => {
                 excerpt,
                 publishedAt: frontmatter.publishedAt || new Date().toISOString(),
                 tags: frontmatter.tags || [],
-                content: '' // Not needed for the homepage
+                content: ''
               });
             } catch (importError) {
               console.error(`Error processing ${path}:`, importError);
             }
           }
 
-          // Sort posts by date (newest first) and take the top 5
           const sortedPosts = posts
             .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
             .slice(0, 5);
@@ -137,9 +122,9 @@ const HomePage: React.FC = () => {
               <span className="command-prompt">roy@terminal:~$</span> 
               <span className="command"> whoami</span>
             </h2>
-            <div className="terminal-response">
-              <p>Engineer | Writer | Explorer | Trying to make sense of the world...</p>
-              <p>Welcome to my digital outpost. Type <span className="command">help</span> for available commands.</p>
+            <div className="terminal-response text-xl">
+              <p>Engineer | Writer  | Trying to make sense of the world...</p>
+              <p className='text-md'>Welcome to my digital outpost.</p>
             </div>
           </section>
 

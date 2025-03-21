@@ -11,10 +11,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [isDisabled, _] = useState<boolean>(true)
   
   useEffect(() => {
-    // Add scan line effect to the terminal
     const terminal = terminalRef.current;
     if (terminal) {
-      // Import VT323 font
       const fontLink = document.createElement('link');
       fontLink.href = 'https://fonts.googleapis.com/css2?family=VT323&display=swap';
       fontLink.rel = 'stylesheet';
@@ -64,7 +62,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       <div className="terminal" ref={terminalRef}>
         <header>
           <h1>Roy::Terminal <span className="blink">_</span></h1>
-          <p className="intro-text">Roy's yap</p>
+          <p className="intro-text">Roy's Engineering and Life reverie</p>
           <div className="command-display"></div>
         </header>
         
@@ -114,7 +112,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         
         <footer>
           <p>[EOF] &copy; {new Date().getFullYear()} Roy Ayoola | 
-            <Link to="/" className="text-accent hover:underline mx-1">rss</Link> | 
+            <Link to="https://x.com/roy_ay0" className="text-accent hover:underline mx-1">X</Link> | 
             <a 
               href="https://github.com/RoyAyo" 
               className="text-accent hover:underline mx-1" 

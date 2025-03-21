@@ -9,14 +9,12 @@ const POSTS_PER_PAGE = 6;
 type FilterLogic = 'ANY' | 'ALL';
 
 const AllPostsPage: React.FC = () => {
-  // Post and filtering state
   const [posts, setPosts] = useState<Post[]>([]);
   const [filteredPosts, setFilteredPosts] = useState<Post[]>([]);
   const [displayedPosts, setDisplayedPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   
-  // Tag filtering state
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [allTags, setAllTags] = useState<string[]>([]);
   const [filterLogic, setFilterLogic] = useState<FilterLogic>('ANY');
@@ -33,23 +31,14 @@ const AllPostsPage: React.FC = () => {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        // Using eager loading to immediately access the module content
         const postModules = import.meta.glob('../blog/**/*.mdx', { eager: true });
         const postData: Post[] = [];
         const tagsSet = new Set<string>();
         const categoriesSet = new Set<string>();
-        
-        console.log('Found modules:', Object.keys(postModules).length);
-        
-        // Process each module
+                
         for (const [path, module] of Object.entries(postModules)) {
           try {
-            // Type assertion for the module
-            const mod = module as any;
-            console.log(`Processing module at path: ${path}`);
-            console.log('Module structure:', mod);
-            
-            // Try different methods to extract frontmatter based on common MDX configurations
+            const mod = module as any;            
             let frontmatter: any = null;
             
             if (mod.frontmatter) {
@@ -97,7 +86,6 @@ const AllPostsPage: React.FC = () => {
               }
             }
             
-            // If frontmatter still can't be found, use default values
             if (!frontmatter) {
               console.warn('No frontmatter found for module, using defaults');
               frontmatter = {};
@@ -165,7 +153,6 @@ const AllPostsPage: React.FC = () => {
     
     if (selectedTags.length > 0) {
       if (filterLogic === 'ANY') {
-        // ANY logic: post must have at least one of the selected tags
         result = result.filter(post => 
           selectedTags.some(tag => post.tags.includes(tag))
         );
@@ -261,7 +248,6 @@ const AllPostsPage: React.FC = () => {
     );
   };
 
-  // Stats for filtered posts
   const renderFilterStats = useMemo(() => {
     if (loading || posts.length === 0) return null;
     
