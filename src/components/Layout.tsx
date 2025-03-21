@@ -18,25 +18,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       fontLink.rel = 'stylesheet';
       document.head.appendChild(fontLink);
       
-      // Add boot-up sequence sound (optional)
-      const playBootSound = () => {
-        const audio = new Audio();
-        audio.src = 'https://freesound.org/data/previews/80/80921_271220-lq.mp3';
-        audio.volume = 0.2;
-        audio.play().catch(e => console.log('Audio autoplay prevented:', e));
-      };
-      
-      // Uncomment to enable boot sound
-      playBootSound();
-      
-      // Set animation delays for post previews
       const postElements = document.querySelectorAll('.post-preview');
       postElements.forEach((el, index) => {
         (el as HTMLElement).style.setProperty('--index', index.toString());
       });
     }
     
-    // Typewriter effect for intro text
     const introText = document.querySelector('.intro-text');
     if (introText) {
       const text = introText.textContent || '';
@@ -55,7 +42,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     }
   }, []);
 
-  // Command execution simulation
   const simulateCommand = (event: React.MouseEvent<HTMLAnchorElement>) => {
     const target = event.currentTarget;
     const commandText = target.getAttribute('data-command');
@@ -65,7 +51,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       commandDisplay.textContent = `> ${commandText}`;
       commandDisplay.classList.add('typing');
       
-      // Reset after animation
       setTimeout(() => {
         commandDisplay.classList.remove('typing');
       }, 1000);
@@ -77,7 +62,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       <div className="terminal" ref={terminalRef}>
         <header>
           <h1>Roy::Terminal <span className="blink">_</span></h1>
-          <p className="intro-text">Roy's engineering insights and life musings</p>
+          <p className="intro-text">Roy's insights and life musings</p>
           <div className="command-display"></div>
         </header>
         
@@ -123,9 +108,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         
         <footer>
           <p>[EOF] &copy; {new Date().getFullYear()} Roy Ayoola | 
-            <Link to="/rss" className="text-accent hover:underline mx-1">rss</Link> | 
+            <Link to="/" className="text-accent hover:underline mx-1">rss</Link> | 
             <a 
-              href="https://github.com/yourusername" 
+              href="https://github.com/RoyAyo" 
               className="text-accent hover:underline mx-1" 
               target="_blank" 
               rel="noopener noreferrer"
@@ -134,9 +119,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             </a>
           </p>
           <div className="system-stats">
-            <span>MEM: {Math.floor(Math.random() * 512) + 256}MB</span> | 
-            <span>CPU: {Math.floor(Math.random() * 50) + 10}%</span> | 
-            <span>UPTIME: {Math.floor(Math.random() * 1000) + 100}h</span>
+            <span>MEM: 980 MB</span> | 
+            <span>CPU: 2%</span> | 
+            {/* <span>UPTIME: {Math.floor(Math.random() * 1000) + 100}h</span> */}
           </div>
         </footer>
       </div>
