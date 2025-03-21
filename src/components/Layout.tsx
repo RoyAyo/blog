@@ -14,7 +14,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             Roy::Terminal 
             <span className="ml-2 inline-block animate-pulse">_</span>
           </h1>
-          <p className="text-sm">Roy Ayoola's backend engineering insights and tech musings</p>
+          <p className="text-sm">Roy's engineering insights and life musings</p>
         </header>
         
         <nav className="mb-8">
