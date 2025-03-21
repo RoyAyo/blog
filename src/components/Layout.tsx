@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 interface LayoutProps {
@@ -7,6 +7,8 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const terminalRef = useRef<HTMLDivElement>(null);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [isDisabled, _] = useState<boolean>(true)
   
   useEffect(() => {
     // Add scan line effect to the terminal
@@ -62,7 +64,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       <div className="terminal" ref={terminalRef}>
         <header>
           <h1>Roy::Terminal <span className="blink">_</span></h1>
-          <p className="intro-text">Roy's insights and life musings</p>
+          <p className="intro-text">Roy's yap</p>
           <div className="command-display"></div>
         </header>
         
@@ -85,18 +87,22 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             all-posts
           </Link> | 
           <Link 
-            to="/about" 
+            // to="/about"
+            // onClick={simulateCommand}
+            to={isDisabled ? "#" : "/destination"}
+            onClick={(e) => isDisabled && e.preventDefault()}
             className="command" 
             data-command="cd /about"
-            onClick={simulateCommand}
           >
             about
           </Link> | 
           <Link 
-            to="/projects" 
+            // to="/projects" 
+            // onClick={simulateCommand}
             className="command" 
             data-command="cd /projects"
-            onClick={simulateCommand}
+            to={isDisabled ? "#" : "/destination"}
+            onClick={(e) => isDisabled && e.preventDefault()}
           >
             projects
           </Link>

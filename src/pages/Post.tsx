@@ -135,16 +135,20 @@ const PostPage: React.FC = () => {
       
       {!loading && !error && post && (
         <article>
-          <h1 className="text-2xl mb-2">
-            <span className="text-yellow-500 font-bold">roy@terminal:~$</span> 
-            <span className="text-blue-400">cat</span> posts/{post.slug}.md
+          <h1 className="text-4xl font-bold text-yellow-400 mb-2">
+            {post.title}
           </h1>
-          <p className="text-gray-400 text-sm mb-2">{new Date(post.publishedAt).toISOString().split('T')[0]}</p>
+          <p className="text-gray-400 text-sm mb-2">
+            {new Date(post.publishedAt).toISOString().split('T')[0]}
+          </p>
+          <hr className="border-gray-700 my-4" />
+          
           <div className="flex flex-wrap gap-2 mb-4">
             {post.tags.map((tag) => (
               <span className="bg-gray-700 text-green-400 text-xs px-2 py-1 rounded" key={tag}>{tag}</span>
             ))}
           </div>
+        
           <div className="prose prose-invert prose-green max-w-none">
             <ReactMarkdown>{post.content}</ReactMarkdown>
           </div>
