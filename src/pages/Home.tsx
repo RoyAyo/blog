@@ -118,18 +118,18 @@ const HomePage: React.FC = () => {
       ) : (
         <>
           <section className="system-info mb-8">
-            <h2 className="text-xl mb-2">
+            <h2 className="text-sm mb-2">
               <span className="command-prompt">roy@terminal:~$</span> 
               <span className="command"> whoami</span>
             </h2>
-            <div className="terminal-response text-xl">
-              <p>Engineer | Writer  | Trying to make sense of the world...</p>
-              <p className='text-md'>Welcome to my digital outpost.</p>
+            <div className="terminal-response text-sm">
+              <p>Software Engineer | chef  </p>
+              <p className='text-sm'>Trying to make sense of the world...</p>
             </div>
           </section>
 
           <section>
-            <h2 className="text-xl mb-4">
+            <h2 className="text-sm mb-4">
               <span className="command-prompt">roy@terminal:~$</span> 
               <span className="command"> cat recent_posts.log</span>
             </h2>
@@ -141,11 +141,21 @@ const HomePage: React.FC = () => {
             )}
             
             {error && <div className="error">{error}</div>}
-            
+
             {!loading && !error && posts.length > 0 ? (
               <div className="posts-container">
-                {posts.map((post) => (
-                  <article className="post-preview" key={post.id}>
+                {posts.map((post, index) => (
+                  <article 
+                    className="post-preview" 
+                    key={post.id} 
+                    style={{ '--index': index } as React.CSSProperties}
+                  >
+                    <Link 
+                      to={`/posts/${post.slug}`} 
+                      className="post-link" 
+                      aria-label={`Read ${post.title}`}
+                    />
+                    
                     <h3 className="text-xl mb-2">
                       <span className="command-prompt">$</span> {post.title}
                     </h3>

@@ -61,8 +61,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     <div className="terminal-container">
       <div className="terminal" ref={terminalRef}>
         <header>
-          <h1>Roy::Terminal <span className="blink">_</span></h1>
-          <p className="intro-text">Roy's Engineering and Life reverie</p>
+          <h1>Roy::Terminal<span className="blink">_</span></h1>
+          <p className="intro-text text-sm">Engineering musing</p>
           <div className="command-display"></div>
         </header>
         
@@ -122,11 +122,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               github
             </a>
           </p>
-          <div className="system-stats">
+          {/* <div className="system-stats">
             <span>MEM: 980 MB</span> | 
-            <span>CPU: 2%</span> | 
+            <span>CPU: 2%</span> |  */}
             {/* <span>UPTIME: {Math.floor(Math.random() * 1000) + 100}h</span> */}
-          </div>
+          {/* </div> */}
         </footer>
       </div>
     </div>
