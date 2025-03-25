@@ -14,5 +14,6 @@ export default defineConfig({
       ]
     }),
     react()
-  ]
+  ],
+  base: '/blog'
 });
